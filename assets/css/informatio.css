@@ -1,0 +1,21 @@
+
+.seccton_info {
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.seccton_info table tr th  {
+    border-radius: 5px;
+    background-color: #2b3142 ;
+    padding: 5px;
+}
+
+.seccton_info table tr td {
+    border-radius: 5px;
+    background-color: #1d212b ;
+    padding: 5px;
+    text-align: center;
+}

@@ -1,0 +1,51 @@
+/* App-wide styling */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body,html {
+    
+    background-color: #0f1116;
+    color: #ffffff;
+    width: 100%;
+
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.header {
+    width: 100%;
+    height: 80px;
+    background-color: #1d212b;
+    margin-bottom: 20px;
+}
+
+.header nav {
+    width: 100%;
+    height: 100%;
+}
+
+.header ul {
+    width: 100%;
+    height: 100%;
+    display:  flex;
+    justify-content: space-around;
+    align-items: center;
+
+}
+
+.header ul li {
+    list-style: none;
+    cursor: pointer;
+}
+
+
+
+
