@@ -42,10 +42,26 @@ main {
 }
 
 .header ul li {
+    display: flex;
     list-style: none;
     cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    position: relative;
+    justify-content: center;
+    transition: all 500ms ease;
 }
 
+.header ul li:hover {
+    transform: translate(-2, -2);
+}
+
+.header ul li > .material-icons  {
+    align-self: center;
+    position: absolute;
+    left: -30px;
+    top: 5px;
+}
 
 
 

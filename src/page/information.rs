@@ -4,7 +4,6 @@ use dioxus::prelude::*;
 use crate::db_connection;
 use crate::hook::use_read;
 
-
 #[component]
 pub fn Information()-> Element {
     let mut data  = use_read::use_reade();
@@ -58,6 +57,11 @@ pub fn Information()-> Element {
                 }
                 
             }
+
+            div { 
+                class: "grafic",
+                GraficInfo { single_data: data }
+            }
         }
     }
 }
@@ -95,5 +99,51 @@ fn FunTable(delete_id: String, data_singla:Signal<Vec<(String, i32, f64, String)
             }
             button {  "Cambiar" }
         }
+    }
+}
+
+
+#[component]
+fn GraficInfo(single_data: Signal<Vec<(String, i32, f64, String)>>) -> Element {
+
+    let datos = use_signal(|| {
+        let data = single_data();
+
+        
+        let mut datos = String::new();
+
+
+        for (_, day, peso, _) in data.into_iter() {
+            if day == 0 && peso == 0.0 {
+                continue;
+            }
+            let tem = format!("{day},{peso} ");
+
+            datos += &tem;
+        }
+
+        datos
+    });
+    let width: i32 = 400;
+    let height: i32 = 200;
+    let padding: i32 = 20; // margen
+
+
+ 
+
+
+    rsx! {
+        p { "{datos()}" }
+        svg {
+            width: "400",
+            height: "200",
+            style: "border: 1px solid red;",
+            polyline {
+                fill: "none",
+                stroke: "white",
+                "stroke-width": "3",
+                points: "10,150 100,100 200,50 300,120",
+            }
+        } 
     }
 }

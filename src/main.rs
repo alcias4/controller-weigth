@@ -10,6 +10,11 @@ use components::header::Header;
 use page::{register::FormRegister, home::Home, information::Information};
 
 
+use dioxus_material_icons::{
+    MaterialIconStylesheet,
+
+};
+
 // styles
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/css/main.css");
@@ -35,13 +40,14 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let menu = use_signal(|| "home".to_string());
+    let menu = use_signal(|| "register".to_string());
     rsx! {
+        
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         document::Link { rel: "stylesheet", href: INFORMATION_CSS }
         document::Link { rel: "stylesheet", href: REGISTER_CSS }
-
+        MaterialIconStylesheet  {}
         main {         
             Header { menu_str: menu }
 

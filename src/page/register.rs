@@ -2,6 +2,8 @@
 use dioxus::prelude::*;
 
 use crate::db_connection;
+use dioxus_material_icons::{MaterialIcon,MaterialIconColor};
+
 
 #[component]
 pub fn FormRegister() -> Element {
@@ -53,7 +55,7 @@ pub fn FormRegister() -> Element {
 
             div { 
                 class: "group_radio",
-                label { "Ingrese si hizo ejericicio " }
+                label { "Ejercicio" }
                 section { 
                     div { 
                         class: "radio",
@@ -76,7 +78,12 @@ pub fn FormRegister() -> Element {
             }
 
             button { 
+                class: "btn_guardar",
                 onclick:insert_new,
+                MaterialIcon {
+                    name: "save",
+                    color: MaterialIconColor::Light
+                }
                 "Guardar info"
             }
         }
