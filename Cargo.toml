@@ -7,9 +7,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+base64 = "0.22.1"
 dioxus = { version = "0.7.1", features = [] }
 dioxus-material-icons = "4.0.1"
+image = {version = "0.25.9" ,features = ["png"]}
 nanoid = "0.4.0"
+plotly = { version = "0.13.5", features = [] }
+plotters = "0.3.7"
 
 rusqlite = { version = "0.37", features = ["bundled"] }
 

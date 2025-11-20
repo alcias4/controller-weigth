@@ -1,8 +1,16 @@
 
 
-use dioxus::prelude::*;
+
+use std::f64;
+
 use crate::db_connection;
 use crate::hook::use_read;
+
+use dioxus::prelude::*;
+use plotters::prelude::*;
+use image::{RgbImage, ImageFormat};
+use base64::engine::general_purpose;
+use base64::Engine as _;
 
 #[component]
 pub fn Information()-> Element {
@@ -106,44 +114,102 @@ fn FunTable(delete_id: String, data_singla:Signal<Vec<(String, i32, f64, String)
 #[component]
 fn GraficInfo(single_data: Signal<Vec<(String, i32, f64, String)>>) -> Element {
 
-    let datos = use_signal(|| {
+    let mut poinst: Signal<Vec<(f64, f64)>> = use_signal(|| Vec::new());
+
+    let mut valore =use_signal(|| (0.0,0.0, 0.0, 0.0) );
+        
+    {
         let data = single_data();
 
-        
-        let mut datos = String::new();
+        let mut point: Vec<(f64, f64)> =  Vec::new();
+
+        let mut max_x =  Vec::new();
+
+        let mut max_y =  Vec::new();
 
 
-        for (_, day, peso, _) in data.into_iter() {
-            if day == 0 && peso == 0.0 {
-                continue;
-            }
-            let tem = format!("{day},{peso} ");
+        for (_, day,peso, _) in data {
+            point.push((day as f64,peso));
+            max_x.push(day);
+            max_y.push(peso as i32);
 
-            datos += &tem;
         }
 
-        datos
-    });
-    let width: i32 = 400;
-    let height: i32 = 200;
-    let padding: i32 = 20; // margen
+        let mx_x = max_x.iter().max().unwrap();
+        let mx_y = max_y.iter().max().unwrap();
+
+        let min_x = max_x.iter().min().unwrap();
+        let min_y = max_y.iter().min().unwrap();
 
 
- 
+        let va = ((*mx_x) as f64,(*mx_y) as f64, (*min_x) as f64,(*min_y) as f64) ;
 
+        valore.set(va);
+        poinst.set(point);
+    };
 
+    
+    let img_src = format!("data:image/png;base64,{}", make_chart_base64(poinst(), valore()));
     rsx! {
-        p { "{datos()}" }
-        svg {
-            width: "400",
-            height: "200",
-            style: "border: 1px solid red;",
-            polyline {
-                fill: "none",
-                stroke: "white",
-                "stroke-width": "3",
-                points: "10,150 100,100 200,50 300,120",
+        div {
+            class: "grafica_content",
+            h1 { "Gráfico simple con Plotters" }
+
+            img {
+                src: "{img_src}",
+                alt: "Gráfico de prueba",
+                style: "border: 1px solid #ccc;"
             }
-        } 
+        }
     }
+}
+
+
+
+fn make_chart_base64(points: Vec<(f64, f64)>, scala: (f64,f64, f64, f64)) -> String{
+    let width: u32 = 400;
+    let height: u32 = 300;
+
+    // Buffer RGB plano: width * height * 3
+    let mut buffer = vec![0u8; (width * height * 3) as usize];
+
+    {
+        // 1) Dibujar con Plotters dentro del buffer
+        let root = BitMapBackend::with_buffer(&mut buffer, (width, height))
+            .into_drawing_area();
+
+        root.fill(&WHITE).unwrap();
+
+        // *** OJO AQUÍ: ejes en f64, igual que tus puntos ***
+        let mut chart = ChartBuilder::on(&root)
+            .margin(10)
+            .set_label_area_size(LabelAreaPosition::Left, 30)
+            .set_label_area_size(LabelAreaPosition::Bottom, 30)
+            .build_cartesian_2d(scala.2..scala.0, scala.3..scala.1)
+            .unwrap();
+
+        chart.configure_mesh().draw().unwrap();
+
+        // Línea y = x
+        chart
+            .draw_series(LineSeries::new(points, &RED))
+            .unwrap();
+
+        root.present().unwrap();
+    }
+
+    // 2) Pasar el buffer RGB a una RgbImage
+    let image = RgbImage::from_raw(width, height, buffer).expect("buffer -> imagen");
+
+    // 3) Codificar la imagen como PNG en memoria (Vec<u8>)
+    let mut png_bytes: Vec<u8> = Vec::new();
+    image
+        .write_to(
+            &mut std::io::Cursor::new(&mut png_bytes),
+            ImageFormat::Png, // <- AQUÍ el cambio: ya no ImageOutputFormat
+        )
+        .unwrap();
+
+    // 4) Convertir PNG (bytes) a base64
+    general_purpose::STANDARD.encode(&png_bytes)
 }
