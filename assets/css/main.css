@@ -10,7 +10,7 @@ body,html {
     
     background-color: #0f1116;
     color: #ffffff;
-    width: 100%;
+    width: 100%;    
 
 }
 
@@ -18,13 +18,39 @@ main {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100vh;
+    padding-top: 80px;
+    position: relative;
 }
 
 .header {
     width: 100%;
     height: 80px;
+    top: 0px;
     background-color: #1d212b;
     margin-bottom: 20px;
+    position: fixed;
+    z-index: 10;
+    
+    animation-name: header-blur;
+    animation-timeline: scroll();   /* ← NUEVO */
+    animation-duration: 1s;         /* se usa como “longitud base” */
+    animation-fill-mode: both;
+}
+
+/* Cómo cambia el blur según el progreso del scroll */
+@keyframes header-blur {
+  0% {
+    backdrop-filter: blur(0px);
+  }
+  30% {
+    backdrop-filter: blur(0px);   /* hasta 30% de scroll, sin blur */
+
+  }
+  100% {
+    backdrop-filter: blur(12px);  /* luego va subiendo hasta 12px */
+    background-color: #1d212b63;
+  }
 }
 
 .header nav {

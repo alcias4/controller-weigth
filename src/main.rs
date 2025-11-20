@@ -29,7 +29,7 @@ fn main() {
     let cfg = Config::new().with_window(
             WindowBuilder::new()
                 .with_title("Resgistros")
-                .with_inner_size(LogicalSize::new(550.0, 600.0))
+                .with_inner_size(LogicalSize::new(500.0, 500.0))
                 .with_min_inner_size(LogicalSize::new(550.0, 600.0))
                 .with_resizable(true)
                 .with_transparent(true)

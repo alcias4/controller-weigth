@@ -30,6 +30,8 @@ pub fn Information()-> Element {
            Err(err) => println!("Error en {}", err)
        }
     };
+
+    
     rsx! {
         section {
             class: "seccton_info",
@@ -52,16 +54,19 @@ pub fn Information()-> Element {
                 }
                 tbody { 
 
-                    for (id, day, peso, ejercicio) in data.read().iter() {
+                    if data().len() > 0 { 
+                        for (id, day, peso, ejercicio) in data.read().iter() {
                         
-                        tr { 
-                            key: "{id}",
-                            td { "{day}" }
-                            td { "{peso}" }
-                            td { "{ejercicio}" }
-                            td { FunTable { delete_id: id, data_singla: data }}
+                            tr { 
+                                key: "{id}",
+                                td { "{day}" }
+                                td { "{peso}" }
+                                td { "{ejercicio}" }
+                                td { FunTable { delete_id: id, data_singla: data }}
+                            }
                         }
                     }
+
                 }
                 
             }
@@ -120,32 +125,34 @@ fn GraficInfo(single_data: Signal<Vec<(String, i32, f64, String)>>) -> Element {
         
     {
         let data = single_data();
+        if data.len() > 0 {
+            
+            let mut point: Vec<(f64, f64)> =  Vec::new();
 
-        let mut point: Vec<(f64, f64)> =  Vec::new();
+            let mut max_x =  Vec::new();
 
-        let mut max_x =  Vec::new();
-
-        let mut max_y =  Vec::new();
+            let mut max_y =  Vec::new();
 
 
-        for (_, day,peso, _) in data {
-            point.push((day as f64,peso));
-            max_x.push(day);
-            max_y.push(peso as i32);
+            for (_, day,peso, _) in data {
+                point.push((day as f64,peso));
+                max_x.push(day);
+                max_y.push(peso as i32);
 
+            }
+
+            let mx_x = max_x.iter().max().unwrap();
+            let mx_y = max_y.iter().max().unwrap();
+
+            let min_x = max_x.iter().min().unwrap();
+            let min_y = max_y.iter().min().unwrap();
+
+
+            let va = ((*mx_x) as f64,(*mx_y) as f64, (*min_x) as f64,(*min_y) as f64) ;
+
+            valore.set(va);
+            poinst.set(point);
         }
-
-        let mx_x = max_x.iter().max().unwrap();
-        let mx_y = max_y.iter().max().unwrap();
-
-        let min_x = max_x.iter().min().unwrap();
-        let min_y = max_y.iter().min().unwrap();
-
-
-        let va = ((*mx_x) as f64,(*mx_y) as f64, (*min_x) as f64,(*min_y) as f64) ;
-
-        valore.set(va);
-        poinst.set(point);
     };
 
     
@@ -153,13 +160,16 @@ fn GraficInfo(single_data: Signal<Vec<(String, i32, f64, String)>>) -> Element {
     rsx! {
         div {
             class: "grafica_content",
-            h1 { "Gráfico simple con Plotters" }
 
-            img {
-                src: "{img_src}",
-                alt: "Gráfico de prueba",
-                style: "border: 1px solid #ccc;"
+            if single_data().len() > 0 {
+                h3 { "Gráfico dia vs peso" }
+                img {
+                    src: "{img_src}",
+                    alt: "Gráfico de prueba",
+                    style: "border: 1px solid #ccc;"
+                }
             }
+
         }
     }
 }
@@ -167,6 +177,11 @@ fn GraficInfo(single_data: Signal<Vec<(String, i32, f64, String)>>) -> Element {
 
 
 fn make_chart_base64(points: Vec<(f64, f64)>, scala: (f64,f64, f64, f64)) -> String{
+
+    println!("{:?}", points.len());
+    if points.len() <= 0 {
+        return "".to_string();
+    }
     let width: u32 = 400;
     let height: u32 = 300;
 
@@ -178,7 +193,7 @@ fn make_chart_base64(points: Vec<(f64, f64)>, scala: (f64,f64, f64, f64)) -> Str
         let root = BitMapBackend::with_buffer(&mut buffer, (width, height))
             .into_drawing_area();
 
-        root.fill(&WHITE).unwrap();
+        root.fill(&WHITE).expect("Error fill color");
 
         // *** OJO AQUÍ: ejes en f64, igual que tus puntos ***
         let mut chart = ChartBuilder::on(&root)
@@ -186,16 +201,16 @@ fn make_chart_base64(points: Vec<(f64, f64)>, scala: (f64,f64, f64, f64)) -> Str
             .set_label_area_size(LabelAreaPosition::Left, 30)
             .set_label_area_size(LabelAreaPosition::Bottom, 30)
             .build_cartesian_2d(scala.2..scala.0, scala.3..scala.1)
-            .unwrap();
+            .expect("Error char create");
 
-        chart.configure_mesh().draw().unwrap();
+        chart.configure_mesh().draw().expect("Error configure char");
 
         // Línea y = x
         chart
             .draw_series(LineSeries::new(points, &RED))
-            .unwrap();
+            .expect("Errro char contex");
 
-        root.present().unwrap();
+        root.present().expect("Error expect root char");
     }
 
     // 2) Pasar el buffer RGB a una RgbImage
@@ -208,7 +223,7 @@ fn make_chart_base64(points: Vec<(f64, f64)>, scala: (f64,f64, f64, f64)) -> Str
             &mut std::io::Cursor::new(&mut png_bytes),
             ImageFormat::Png, // <- AQUÍ el cambio: ya no ImageOutputFormat
         )
-        .unwrap();
+        .expect("Error image bytes");
 
     // 4) Convertir PNG (bytes) a base64
     general_purpose::STANDARD.encode(&png_bytes)

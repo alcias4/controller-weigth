@@ -1,4 +1,10 @@
 [application]
+name = "controller"
+default_platform = "desktop"
+asset_dir = "assets"
+public_dir = "public"
+
+
 
 [web.app]
 
@@ -19,3 +25,13 @@ script = []
 # Javascript code file
 # serve: [dev-server] only
 script = []
+
+
+[bundle]
+# Identificador estilo "dominio al revés"
+identifier = "com.andra.controller_weight"
+
+# El “publisher” que te está pidiendo el error
+publisher = "Andra"
+resources = ["assets/**"]
+icon = ["assets/header.svg"]
